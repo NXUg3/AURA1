@@ -1,10 +1,193 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Axie Smash</title><link rel="stylesheet" href="./css/styles.css"><link rel="stylesheet" href="./css/layout.css"><link rel="stylesheet" href="./css/arcade.css"></head>
-<body class="arcade-theme"><main id="stage" aria-label="Axie Smash">
-<canvas id="game" width="1280" height="720"></canvas>
-<section id="scene" class="screen"><p role="status">Cargando recursos…</p></section>
-<aside id="hud" hidden><div id="hud-p1"></div><strong id="timer">60</strong><div id="hud-p2"></div></aside>
-<div id="callout" hidden aria-live="polite"><span id="round-label"></span><strong id="round-word"></strong></div>
-<div id="touch" hidden><button data-key="a">◀</button><button data-key="d">▶</button><button data-key="w">⤒</button><button data-key="j">J</button><button data-key="k">K</button><button data-key="l">L</button></div>
-<footer>AXIE SMASH · VibeAthon Edition</footer>
-</main><script type="module" src="./js/game.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Axie Smash</title>
+<link rel="stylesheet" href="./src/styles/game.css">
+</head>
+<body>
+
+<div id="game-container">
+
+  <!-- ============ INTRO ============ -->
+  <div id="screen-intro" class="screen">
+    <video id="intro-video" preload="auto" playsinline>
+      <source src="./assets/video/intro.mp4" type="video/mp4">
+    </video>
+    <button id="intro-play-btn" class="intro-action hidden" type="button">▶ REPRODUCIR INTRO</button>
+    <button id="intro-skip-btn" class="intro-skip" type="button">OMITIR ▶</button>
+  </div>
+
+  <!-- ============ TITLE ============ -->
+  <div id="screen-title" class="screen hidden">
+    <div id="press-start">PRESS START</div>
+  </div>
+
+  <!-- ============ MENÚ PRINCIPAL ============ -->
+  <div id="screen-menu" class="screen hidden">
+    <canvas id="menu-mascot-canvas" width="320" height="440" class="hidden"></canvas>
+    <div class="menu-title-v2" id="menu-title-text">MENÚ PRINCIPAL</div>
+    <div class="menu-list" id="menu-list"></div>
+    <div class="menu-desc-panel" id="menu-desc-panel">Selecciona una opción.</div>
+  </div>
+
+  <!-- ============ OPCIONES ============ -->
+  <div id="screen-options" class="screen bg-arcade hidden">
+    <div class="options-title" id="options-title-text">OPCIONES</div>
+    <div class="options-panel">
+      <div class="opt-row"><label id="opt-label-res">RESOLUCIÓN</label><div class="opt-choices" id="opt-resolution"></div></div>
+      <div class="opt-row"><label id="opt-label-fps">FPS</label><div class="opt-choices" id="opt-fps"></div></div>
+      <div class="opt-row"><label id="opt-label-lang">IDIOMA</label><div class="opt-choices" id="opt-lang"></div></div>
+      <div class="opt-row"><label id="opt-label-master">VOL. MASTER</label><input type="range" id="opt-master-vol" min="0" max="100" value="80"><span class="opt-vol-value" id="opt-master-value">80</span></div>
+      <div class="opt-row"><label id="opt-label-sfx">VOL. SFX</label><input type="range" id="opt-sfx-vol" min="0" max="100" value="80"><span class="opt-vol-value" id="opt-sfx-value">80</span></div>
+    </div>
+    <button class="arcade-btn" id="options-save-btn">GUARDAR Y REGRESAR</button>
+  </div>
+
+  <!-- ============ CONTROLES (remapeo) ============ -->
+  <div id="screen-controls" class="screen bg-arcade hidden">
+    <div class="options-title" id="controls-title-text">CONTROLES</div>
+    <div class="ctrl-tabs" id="ctrl-tabs"></div>
+    <div class="ctrl-panel-body" id="ctrl-panel-body"></div>
+    <button class="arcade-btn" id="controls-save-btn">GUARDAR Y REGRESAR</button>
+  </div>
+
+  <!-- ============ PLAYER DATA ============ -->
+  <div id="screen-playerdata" class="screen bg-arcade hidden">
+    <div class="game-title" style="font-size:30px;" id="pd-title-text">PLAYER DATA</div>
+    <div class="pd-grid" id="pd-grid"></div>
+  </div>
+
+  <!-- ============ HELP ============ -->
+  <div id="screen-help" class="screen hidden">
+    <div class="help-panel">
+      <div class="help-title" id="help-title-text">HELP</div>
+      <p class="help-lead" id="help-lead-text"></p>
+      <div class="help-grid" id="help-grid"></div>
+    </div>
+  </div>
+
+  <!-- ============ CRÉDITOS ============ -->
+  <div id="screen-credits" class="screen hidden">
+    <div class="credits-viewport">
+      <div class="credits-crawl" id="credits-crawl-content"></div>
+    </div>
+  </div>
+
+  <!-- ============ CHAR SELECT — composición inspirada en 2XKO ============ -->
+  <div id="screen-charselect" class="screen hidden">
+    <div class="cs-title" id="cs-title-text">SELECT CHARACTERS</div>
+    <div class="cs-main">
+      <div class="portrait-col portrait-col-left">
+        <div class="portrait-frame-lg"><img id="p1-portrait-img" class="portrait-img" alt="P1"></div>
+        <img id="p1-preview-logo" class="preview-logo" alt="Logo P1">
+        <div class="portrait-name" id="p1-portrait-label">OLEG</div>
+        <div class="portrait-subtitle" id="p1-portrait-subtitle">GUARDIÁN VERDE · PLANTA</div>
+        <div class="portrait-tag">1P</div>
+        <div class="core-chips" id="p1-core-parts-select"></div>
+        <div class="stats-panel" id="p1-stats-panel"></div>
+      </div>
+      <div class="cs-versus-mark" aria-hidden="true">VS</div>
+      <div class="portrait-col portrait-col-right">
+        <div class="portrait-frame-lg"><img id="p2-portrait-img" class="portrait-img" alt="P2"></div>
+        <img id="p2-preview-logo" class="preview-logo" alt="Logo P2">
+        <div class="portrait-name" id="p2-portrait-label">KOTARO</div>
+        <div class="portrait-subtitle" id="p2-portrait-subtitle">MERCENARIO YETI · BESTIA</div>
+        <div class="portrait-tag" id="p2-portrait-tag">2P</div>
+        <div class="core-chips" id="p2-core-parts-select"></div>
+        <div class="stats-panel" id="p2-stats-panel"></div>
+      </div>
+    </div>
+
+    <div class="cs-grid-center">
+      <div class="cs-grid-label" id="cs-grid-label">1P: WASD &nbsp;·&nbsp; 2P: FLECHAS</div>
+      <div class="cs-grid" id="shared-char-grid"></div>
+    </div>
+
+    <div class="cs-controls-legend">
+      <button class="legend-btn" id="btn-confirm">✕ CONFIRM</button>
+      <button class="legend-btn" id="btn-back-cs">◯ BACK</button>
+      <button class="legend-btn" id="btn-random">□ RANDOM</button>
+      <button class="legend-btn" id="btn-commandlist">△ COMMAND LIST</button>
+      <button class="legend-btn" id="btn-settings-cs">⚙ CONTROL SETTINGS</button>
+    </div>
+
+    <div id="command-list-modal" class="hidden">
+      <div class="cl-box">
+        <h3 id="cl-title">LISTA DE COMANDOS</h3>
+        <div id="cl-body"></div>
+        <button class="arcade-btn cl-close-btn" id="cl-close-btn">CERRAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VS LOADING ============ -->
+  <div id="screen-vs" class="screen hidden">
+    <div class="vs-side vs-side-left">
+      <img id="vs-p1-art" class="vs-art" alt="P1">
+      <img id="vs-p1-logo" class="vs-logo" alt="Logo P1">
+      <strong id="vs-p1-name">OLEG</strong>
+    </div>
+    <div class="vs-center"><span>VS</span><small>AXIE SMASH</small></div>
+    <div class="vs-side vs-side-right">
+      <img id="vs-p2-art" class="vs-art" alt="P2">
+      <img id="vs-p2-logo" class="vs-logo" alt="Logo P2">
+      <strong id="vs-p2-name">KOTARO</strong>
+    </div>
+  </div>
+
+  <!-- ============ VICTORY ============ -->
+  <div id="screen-victory" class="screen hidden">
+    <h1 id="victory-text">¡VICTORIA DEL JUGADOR 1!</h1>
+    <div class="victory-actions">
+      <button class="arcade-btn" id="rematch-btn">REVANCHA</button>
+      <button class="arcade-btn secondary" id="menu-btn">MENÚ PRINCIPAL</button>
+    </div>
+  </div>
+
+  <!-- ============ BATTLE HUD ============ -->
+  <div id="hud" class="hidden">
+    <div class="character-logo-slot" id="p1-logo-slot"><img id="p1-hud-logo" alt="Logo P1"></div>
+    <div class="hp-block" id="p1-hp-block">
+      <div class="hp-frame"><i class="frame-bolt left"></i><i class="frame-bolt right"></i><div class="hp-bar-outer"><div class="hp-bar-inner" id="p1-hp-bar" style="width:100%"></div></div></div>
+      <div class="hud-status-row"><div class="hp-label" id="p1-hp-label">JUGADOR 1</div><div class="class-status" id="p1-class-status">PLANT</div></div>
+      <div class="energy-frame"><span class="energy-label">AXP</span><div class="axp-bar-outer" id="p1-axp-outer"><div class="axp-bar-inner" id="p1-axp-bar" style="width:0%"></div></div></div>
+      <div class="core-chips hud-chips" id="p1-core-parts-hud"></div>
+      <div class="round-wins" id="p1-round-wins" role="img" aria-label="0 / 2"><i></i><i></i></div>
+    </div>
+    <div class="hud-center-slot" aria-hidden="true"></div>
+    <div class="hp-block" id="p2-hp-block">
+      <div class="hp-frame"><i class="frame-bolt left"></i><i class="frame-bolt right"></i><div class="hp-bar-outer"><div class="hp-bar-inner" id="p2-hp-bar" style="width:100%"></div></div></div>
+      <div class="hud-status-row"><div class="hp-label" id="p2-hp-label">JUGADOR 2</div><div class="class-status" id="p2-class-status">BEAST</div></div>
+      <div class="energy-frame"><span class="energy-label">AXP</span><div class="axp-bar-outer" id="p2-axp-outer"><div class="axp-bar-inner" id="p2-axp-bar" style="width:0%"></div></div></div>
+      <div class="core-chips hud-chips" id="p2-core-parts-hud"></div>
+      <div class="round-wins" id="p2-round-wins" role="img" aria-label="0 / 2"><i></i><i></i></div>
+    </div>
+    <div class="character-logo-slot" id="p2-logo-slot"><img id="p2-hud-logo" alt="Logo P2"></div>
+  </div>
+  <div id="timer" class="hidden"><div class="timer-core"><span id="timer-value">60</span></div></div>
+  <div id="controls-hint" class="hidden"></div>
+  <div id="round-callout" class="hidden" aria-live="polite"><span id="round-caption"></span><strong id="round-word"></strong></div>
+
+  <div id="touch-controls" class="hidden">
+    <div class="touch-dpad">
+      <div class="touch-btn" id="tb-left">◀</div>
+      <div class="touch-btn" id="tb-right">▶</div>
+    </div>
+    <div class="touch-actions">
+      <div class="touch-btn jump" id="tb-jump">⤒</div>
+      <div class="touch-btn" id="tb-basic">J</div>
+      <div class="touch-btn" id="tb-special">K</div>
+      <div class="touch-btn" id="tb-overdrive">⚡</div>
+    </div>
+  </div>
+
+  <canvas id="game-canvas" width="900" height="560"></canvas>
+
+  <button id="global-back-btn" class="hidden">◀ REGRESAR</button>
+  <div id="watermark-ticker"><span id="watermark-text">⚠️ PROTOTIPO EN DESARROLLO - NO ES UNA VERSIÓN FINAL — ⚠️ PROTOTIPO EN DESARROLLO - NO ES UNA VERSIÓN FINAL —</span></div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
