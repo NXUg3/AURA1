@@ -1,0 +1,9 @@
+const DEFAULT={p1:{left:'a',right:'d',jump:'w',basic:'j',special:'k',overdrive:'l'},p2:{left:'arrowleft',right:'arrowright',jump:'arrowup',basic:'control',special:'shift',overdrive:'/'}};
+export class Controls{
+  constructor(){this.keys=new Set();this.map=structuredClone(DEFAULT);try{const saved=JSON.parse(localStorage.getItem('axieSmashKeymap'));if(saved)for(const side of ['p1','p2'])for(const action of Object.keys(DEFAULT[side]))if(typeof saved[side]?.[action]==='string')this.map[side][action]=saved[side][action];}catch{}
+    window.addEventListener('keydown',e=>{if(['INPUT','SELECT'].includes(e.target.tagName))return;this.keys.add(e.key.toLowerCase());if(e.key.startsWith('Arrow'))e.preventDefault();});window.addEventListener('keyup',e=>this.keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>this.keys.clear());
+    document.querySelectorAll('[data-key]').forEach(button=>{const key=button.dataset.key;button.addEventListener('pointerdown',e=>{button.setPointerCapture(e.pointerId);this.keys.add(key);});for(const event of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(event,()=>this.keys.delete(key));});
+  }
+  save(){try{localStorage.setItem('axieSmashKeymap',JSON.stringify(this.map));}catch{}}
+  apply(fighter,side,index,audio){const scheme=this.map[side],pad=navigator.getGamepads?.()[index],held=action=>this.keys.has(scheme[action]);const left=held('left')||(pad?.axes[0]||0)<-.3,right=held('right')||(pad?.axes[0]||0)>.3;fighter.vx=(Number(right)-Number(left))*fighter.speed;if((held('jump')||pad?.buttons[0]?.pressed)&&fighter.onGround){fighter.vy=fighter.jumpPower;fighter.onGround=false;audio.jump();}if(held('basic')||pad?.buttons[2]?.pressed)fighter.startAttack('basic');if(held('special')||pad?.buttons[3]?.pressed)fighter.startAttack('special');if(held('overdrive')||pad?.buttons[1]?.pressed)fighter.activateOverdrive();}
+}
