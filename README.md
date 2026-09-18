@@ -40,7 +40,7 @@ modular/
 
 Orden exacto: Oleg, Momo, Buba, Pomodoro, Trip, Venoki, Puff, Kotaro. El cursor recorre también los bloqueados; confirmar se deshabilita hasta que ambos cursores estén sobre personajes jugables.
 
-Cada personaje carga su icono desde `assets/sprites/[nombre]/logo.png` y su arte completo desde `portrait.png`. Los cuatro personajes jugables también aceptan `atlas.png` y las hojas normalizadas `idle.png`, `walk.png`, `jump.png` y `attack.png`.
+Cada personaje carga el logo adjunto desde `assets/sprites/[nombre]/logo.png`. Para usar SVG, cambia la extensión de `logo` en `src/core/AssetLoader.js`. Los cuatro personajes jugables también aceptan `atlas.png` y las hojas normalizadas `idle.png`, `walk.png`, `jump.png` y `attack.png`.
 
 La pantalla VS precede a una secuencia Ready / Steady / Fight de 2700 ms, durante la que no avanzan las físicas, los ataques, la animación ni el cronómetro. Se necesitan dos rondas para ganar: 2–0 o 2–1. Un empate repite la misma ronda sin conceder puntos. La revancha reinicia el marcador.
 

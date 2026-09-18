@@ -4,8 +4,7 @@ Carpetas oficiales: `oleg/`, `kotaro/`, `pomodoro/`, `buba/`, `momo/`, `trip/`, 
 
 Todas deben incluir:
 
-- `logo.png` (icono PNG)
-- `portrait.png` (arte completo PNG)
+- `logo.png` (imágenes oficiales adjuntas; también se puede configurar SVG en AssetLoader)
 
 Los personajes jugables admiten además:
 

@@ -8,7 +8,6 @@ const TRACK_BY_STATE = Object.freeze({
   CONTROLS: ASSET_PATHS.audio.mainMenu,
   CREDITS: ASSET_PATHS.audio.mainMenu,
   PLAYER_DATA: ASSET_PATHS.audio.mainMenu,
-  ROOM: ASSET_PATHS.audio.mainMenu,
   CHAR_SELECT: ASSET_PATHS.audio.characterSelect,
   VS: ASSET_PATHS.audio.characterSelect,
   BATTLE: ASSET_PATHS.audio.combatTheme,
