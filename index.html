@@ -25,6 +25,7 @@
 
   <!-- ============ MENÚ PRINCIPAL ============ -->
   <div id="screen-menu" class="screen hidden">
+    <img class="menu-key-art" src="./assets/sprites/oleg/portrait.png" alt="Oleg">
     <canvas id="menu-mascot-canvas" width="320" height="440" class="hidden"></canvas>
     <div class="menu-title-v2" id="menu-title-text">MENÚ PRINCIPAL</div>
     <div class="menu-list" id="menu-list"></div>
@@ -32,6 +33,14 @@
   </div>
 
   <!-- ============ OPCIONES ============ -->
+  <div id="screen-room" class="screen hidden">
+    <section class="room-panel">
+      <h1 id="room-title">SALA</h1><p id="room-description"></p>
+      <div class="room-actions"><button class="arcade-btn" id="room-create">CREAR</button><button class="arcade-btn secondary" id="room-join">UNIRSE</button></div>
+      <label id="room-code-label" for="room-code">CÓDIGO</label><input id="room-code" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC123">
+      <p id="room-status" role="status" aria-live="polite"></p><button class="arcade-btn secondary" id="room-leave">SALIR DE SALA</button>
+    </section>
+  </div>
   <div id="screen-options" class="screen bg-arcade hidden">
     <div class="options-title" id="options-title-text">OPCIONES</div>
     <div class="options-panel">

@@ -2,7 +2,7 @@
   html, body {
     width:100%; height:100%;
     background:#050510;
-    font-family: 'Trebuchet MS', 'Arial Black', sans-serif;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
     overflow:hidden;
     user-select:none;
   }
@@ -405,3 +405,22 @@
   .callout-pop { animation:round-pop .3s cubic-bezier(.15,.7,.25,1) both; }
   @keyframes round-pop { from { opacity:0; transform:scale(1.55) skewX(-12deg); } to { opacity:1; transform:scale(1) skewX(-5deg); } }
   @media (prefers-reduced-motion:reduce) { .callout-pop { animation:none; } }
+  #game-container { border:3px solid #75eee7; border-radius:2px; box-shadow:0 0 24px #30a8b633,inset 0 0 20px #0008; }
+  #screen-menu { background:repeating-linear-gradient(120deg,transparent 0 82px,#69fbef08 83px 85px),linear-gradient(110deg,#080d17 0 48%,#172b32 49%,#061119 100%); }
+  .menu-key-art { position:absolute; right:-15px; bottom:18px; width:53%; height:82%; object-fit:contain; opacity:.7; filter:drop-shadow(0 0 16px #64edc544); pointer-events:none; }
+  .menu-title-v2 { font-family:'Segoe UI','Arial',sans-serif; font-size:27px; font-weight:900; font-style:italic; letter-spacing:2px; color:#fff; text-shadow:2px 0 #5aede7; }
+  .menu-list { top:94px; left:38px; width:390px; gap:8px; }
+  .menu-item { min-height:48px; padding:12px 18px; font-size:19px; font-weight:900; font-style:italic; letter-spacing:1.4px; border-left:4px solid #384856; color:#d7e2ee; background:#131d2bdd; clip-path:polygon(0 0,95% 0,100% 100%,0 100%); }
+  .menu-item.active { color:#031319; border-left-color:#77fff1; background:linear-gradient(100deg,#67fff0,#63c8ee); transform:translateX(7px); box-shadow:0 0 12px #63ffff44; }
+  .menu-item.disabled { color:#667183; cursor:not-allowed; }
+  .menu-item.disabled.active { background:#182432; color:#8290a3; }
+  .menu-item .badge-soon { font-family:'Segoe UI',sans-serif; font-style:normal; border-radius:0; background:#e4465e; font-size:9px; padding:4px 7px; }
+  .menu-desc-panel { left:40px; bottom:54px; max-width:410px; background:#070d16dd; border-left:3px solid #57e9df; color:#b9dce7; }
+  .arcade-btn,.options-title,.cs-title,.portrait-name,.help-title { font-family:'Segoe UI','Arial',sans-serif; font-weight:900; }
+  .room-panel { width:min(76%,620px); padding:26px; background:#0b1628; border:1px solid #65eee8; box-shadow:10px 10px #050914; color:#e0f4ff; }
+  .room-panel h1 { font-size:30px; font-style:italic; letter-spacing:4px; }
+  .room-panel p { font-size:13px; line-height:1.6; margin:12px 0; }
+  .room-actions { display:flex; gap:12px; margin:18px 0; }
+  .room-panel label { font-size:12px; font-weight:800; letter-spacing:2px; }
+  #room-code { display:block; margin:10px 0; width:100%; padding:12px; background:#020b16; border:1px solid #4c7e9d; color:#7cfff1; font:900 24px 'Segoe UI',sans-serif; letter-spacing:8px; user-select:text; }
+  #room-status { min-height:42px; color:#7cfff1; }

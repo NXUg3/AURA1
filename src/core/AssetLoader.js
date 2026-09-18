@@ -13,8 +13,8 @@ export const ASSET_PATHS=Object.freeze({
   ui:Object.freeze({
     gameLogo:'./assets/ui/game-logo.png',
     portraits:Object.freeze({
-      oleg:'./assets/ui/plant-icon.png', kotaro:'./assets/ui/beast-icon.png',
-      pomodoro:'./assets/ui/fuerino-portrait.png', buba:'./assets/ui/toyho-portrait.png'
+      oleg:'./assets/sprites/oleg/portrait.png', kotaro:'./assets/sprites/kotaro/portrait.png',
+      pomodoro:'./assets/sprites/pomodoro/portrait.png', buba:'./assets/sprites/buba/portrait.png'
     })
   }),
   audio:Object.freeze({

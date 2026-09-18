@@ -222,6 +222,7 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
     CREDITS: document.getElementById('screen-credits'),
     CHAR_SELECT: document.getElementById('screen-charselect'),
     VS: document.getElementById('screen-vs'),
+    ROOM: document.getElementById('screen-room'),
     VICTORY: document.getElementById('screen-victory'),
   };
   const hud = document.getElementById('hud');
@@ -255,7 +256,7 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
   let STATE = 'INTRO';
   let optionsReturnState = 'MENU';
   let controlsReturnState = 'MENU';
-  const BACK_ALLOWED = ['MENU', 'OPTIONS', 'CONTROLS', 'PLAYER_DATA', 'HELP', 'CREDITS'];
+  const BACK_ALLOWED = ['MENU', 'OPTIONS', 'CONTROLS', 'PLAYER_DATA', 'HELP', 'CREDITS', 'ROOM'];
 
   function goTo(newState) {
     if (STATE === 'INTRO' && newState !== 'INTRO') introVideo.pause();
@@ -282,6 +283,7 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
     if (newState === 'PLAYER_DATA') renderPlayerDataScreen();
     if (newState === 'HELP') renderHelpScreen();
     if (newState === 'CREDITS') renderCreditsScreen();
+    if (newState === 'ROOM') renderRoomScreen();
     if (newState === 'CHAR_SELECT') refreshCharSelectUI();
     if (newState === 'VS') renderVsScreen();
     if (newState === 'VICTORY') {
@@ -296,12 +298,14 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
   }
   function handleGlobalBack() {
     AudioMgr.move();
-    if (STATE === 'MENU') goTo('TITLE');
+    if (STATE === 'MENU' && menuGroup !== 'root') { menuGroup='root'; menuSelectedIndex=0; renderMenuScreen(); }
+    else if (STATE === 'MENU') goTo('TITLE');
     else if (STATE === 'OPTIONS') goTo(optionsReturnState);
     else if (STATE === 'CONTROLS') goTo(controlsReturnState);
     else if (STATE === 'PLAYER_DATA') goTo('MENU');
     else if (STATE === 'HELP') goTo('MENU');
     else if (STATE === 'CREDITS') goTo('MENU');
+    else if (STATE === 'ROOM') { leaveRoom(); goTo('MENU'); }
   }
   globalBackBtn.addEventListener('click', handleGlobalBack);
 
@@ -466,23 +470,38 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
   const menuDescPanel = document.getElementById('menu-desc-panel');
   const menuTitleText = document.getElementById('menu-title-text');
   let menuSelectedIndex = 0;
+  let menuGroup = 'root';
+  const uiText = (es,en,ja) => settings.lang === 'ja' ? ja : settings.lang === 'en' ? en : es;
+  function openMenuGroup(group) { menuGroup=group; menuSelectedIndex=0; renderMenuScreen(); }
 
   function getMenuItems() {
+    const item=(id,label,action,disabled=false)=>({id,label,action,disabled,soon:disabled?t('m_soon'):null,desc:disabled?t('m_soon'):label});
+    const back=item('back',t('back'),()=>openMenuGroup('root'));
+    if (menuGroup==='local') return [
+      item('arcade',t('m_arcade'),()=>{gameMode='AI';goTo('CHAR_SELECT');}),
+      item('versus',t('m_versus'),()=>{gameMode='LOCAL';goTo('CHAR_SELECT');}),
+      item('campaign',uiText('CAMPAÑA','CAMPAIGN','キャンペーン'),null,true),
+      item('tournament',uiText('TORNEOS','TOURNAMENTS','トーナメント'),null,true),back];
+    if (menuGroup==='multi') return [
+      item('quick',uiText('PARTIDA RÁPIDA','QUICK MATCH','クイックマッチ'),null,true),
+      item('ranked',uiText('CLASIFICATORIA','RANKED','ランク戦'),null,true),
+      item('room',uiText('SALA','ROOM','ルーム'),()=>goTo('ROOM')),back];
+    if (menuGroup==='help') return [
+      item('guide',uiText('GUÍA DEL JUEGO','GAME GUIDE','ゲームガイド'),()=>goTo('HELP')),
+      item('controls',t('m_controls'),()=>{controlsReturnState='MENU';goTo('CONTROLS');}),
+      item('credits',t('m_credits'),()=>goTo('CREDITS')),back];
     return [
-      { id:'arcade', label:t('m_arcade'), desc:t('m_arcade_desc'), disabled:false, action: () => { gameMode='AI'; goTo('CHAR_SELECT'); } },
-      { id:'versus', label:t('m_versus'), desc:t('m_versus_desc'), disabled:false, action: () => { gameMode='LOCAL'; goTo('CHAR_SELECT'); } },
-      { id:'multi', label:t('m_multi'), desc:t('m_multi_desc'), disabled:true, soon:t('m_soon'), action:null },
-      { id:'pdata', label:t('m_pdata'), desc:t('m_pdata_desc'), disabled:true, soon:t('m_soon'), action:null },
-      { id:'help', label:t('m_help'), desc:t('m_help_desc'), disabled:false, action: () => goTo('HELP') },
-      { id:'controls', label:t('m_controls'), desc:t('m_controls_desc'), disabled:false, action: () => { controlsReturnState='MENU'; goTo('CONTROLS'); } },
-      { id:'options', label:t('m_options'), desc:t('m_options_desc'), disabled:false, action: () => { optionsReturnState='MENU'; goTo('OPTIONS'); } },
-      { id:'credits', label:t('m_credits'), desc:t('m_credits_desc'), disabled:false, action: () => goTo('CREDITS') },
-      { id:'exit', label:t('m_exit'), desc:t('m_exit_desc'), disabled:false, action: () => { player1=null; player2=null; goTo('TITLE'); } },
-    ];
+      item('local',uiText('LOCAL','LOCAL','ローカル'),()=>openMenuGroup('local')),
+      item('multi',t('m_multi'),()=>openMenuGroup('multi')),
+      item('help',t('m_help'),()=>openMenuGroup('help')),
+      item('profile',uiText('PERFIL','PROFILE','プロフィール'),()=>goTo('PLAYER_DATA')),
+      item('options',t('m_options'),()=>{optionsReturnState='MENU';goTo('OPTIONS');}),
+      item('exit',t('m_exit'),()=>{player1=null;player2=null;goTo('TITLE');})];
   }
   function renderMenuScreen() {
-    menuTitleText.textContent = t('menu_title');
+    menuTitleText.textContent = menuGroup==='root'?t('menu_title'):menuGroup==='local'?uiText('LOCAL','LOCAL','ローカル'):menuGroup==='multi'?t('m_multi'):t('m_help');
     const items = getMenuItems();
+    menuSelectedIndex=Math.min(menuSelectedIndex,items.length-1);
     menuListEl.innerHTML = '';
     items.forEach((item, idx) => {
       const div = document.createElement('div');
@@ -505,6 +524,56 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
     AudioMgr.confirm();
     if (item.action) item.action();
   }
+
+  // Local lobby transport: no Internet matchmaking is simulated.
+  let roomChannel=null, roomTimeout=null, roomHost=false, roomPeer='';
+  const roomToken=Math.random().toString(36).slice(2);
+  const roomStatus=document.getElementById('room-status');
+  function leaveRoom() {
+    clearTimeout(roomTimeout);
+    if(roomChannel){roomChannel.postMessage({type:'leave',token:roomToken});roomChannel.close();}
+    roomChannel=null;roomPeer='';roomHost=false;
+    roomStatus.textContent=uiText('Sin sala activa.','No active room.','参加中のルームはありません。');
+  }
+  function renderRoomScreen() {
+    document.getElementById('room-title').textContent=uiText('SALA','ROOM','ルーム');
+    document.getElementById('room-description').textContent=uiText('Sala local entre pestañas del mismo navegador y dirección web. El juego por Internet requiere un servidor; esta sala no sincroniza combates.','Local lobby between tabs at the same web address. Internet play requires a server; this lobby does not synchronize fights.','同じブラウザーとURLのタブ間ロビーです。オンライン対戦にはサーバーが必要です。このロビーは試合を同期しません。');
+    document.getElementById('room-create').textContent=uiText('CREAR','CREATE','作成');
+    document.getElementById('room-join').textContent=uiText('UNIRSE','JOIN','参加');
+    document.getElementById('room-code-label').textContent=uiText('CÓDIGO DE SALA','ROOM CODE','ルームコード');
+    document.getElementById('room-leave').textContent=uiText('SALIR DE SALA','LEAVE ROOM','退出');
+    if(!roomChannel)leaveRoom();
+  }
+  function connectRoom(host) {
+    leaveRoom();
+    if(typeof BroadcastChannel==='undefined'){roomStatus.textContent=uiText('Tu navegador no admite salas locales.','Local lobbies are unsupported in this browser.','このブラウザーはローカルロビー非対応です。');return;}
+    const input=document.getElementById('room-code');
+    const code=host?Array.from(crypto.getRandomValues(new Uint8Array(6)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%32]).join(''):input.value.trim().toUpperCase();
+    if(!/^[A-Z2-9]{6}$/.test(code)){roomStatus.textContent=uiText('Introduce un código válido de 6 caracteres.','Enter a valid 6-character code.','6文字の有効なコードを入力してください。');return;}
+    input.value=code;roomHost=host;roomChannel=new BroadcastChannel('axie-smash-room-'+code);
+    roomStatus.textContent=host?uiText('Sala creada. Esperando jugador…','Room created. Waiting for a player…','作成済み。プレイヤーを待っています…'):uiText('Buscando sala…','Finding room…','検索中…');
+    roomChannel.onmessage=({data})=>{
+      if(!data||typeof data.type!=='string')return;
+      if(roomHost&&data.type==='join'){
+        const accepted=!roomPeer||roomPeer===data.token;
+        if(accepted)roomPeer=data.token;
+        roomChannel.postMessage({type:accepted?'accepted':'full',target:data.token,token:roomToken});
+        if(accepted)roomStatus.textContent=uiText('Dos jugadores conectados al lobby local.','Two players connected to the local lobby.','ローカルロビーに2人接続しました。');
+      }else if(!roomHost&&data.target===roomToken&&data.type==='accepted'){
+        clearTimeout(roomTimeout);roomPeer=data.token;roomStatus.textContent=uiText('Te has unido al lobby local.','Joined the local lobby.','ローカルロビーに参加しました。');
+      }else if(!roomHost&&data.target===roomToken&&data.type==='full'){
+        leaveRoom();roomStatus.textContent=uiText('La sala está llena.','Room is full.','ルームが満員です。');
+      }else if(data.type==='leave'&&data.token===roomPeer){
+        if(roomHost){roomPeer='';roomStatus.textContent=uiText('El otro jugador salió. Esperando…','Player left. Waiting…','相手が退出しました。待機中…');}
+        else {leaveRoom();roomStatus.textContent=uiText('El anfitrión cerró la sala.','Host closed the room.','ホストがルームを閉じました。');}
+      }
+    };
+    if(!host){roomChannel.postMessage({type:'join',token:roomToken});roomTimeout=setTimeout(()=>{if(!roomPeer){leaveRoom();roomStatus.textContent=uiText('Sala no encontrada. Abre otra pestaña en esta dirección y crea una sala.','Room not found. Create a room in another tab at this address.','見つかりません。同じURLの別タブでルームを作成してください。');}},2200);}
+  }
+  document.getElementById('room-create').addEventListener('click',()=>connectRoom(true));
+  document.getElementById('room-join').addEventListener('click',()=>connectRoom(false));
+  document.getElementById('room-leave').addEventListener('click',leaveRoom);
+  window.addEventListener('pagehide',leaveRoom);
 
   // ===========================================================
   // OPCIONES
@@ -661,7 +730,7 @@ import { createSpriteRegistry } from './systems/SpriteRegistry.js';
   // PLAYER DATA
   // ===========================================================
   function renderPlayerDataScreen() {
-    document.getElementById('pd-title-text').textContent = t('pd_title');
+    document.getElementById('pd-title-text').textContent = uiText('PERFIL','PROFILE','プロフィール');
     const grid = document.getElementById('pd-grid');
     const rows = [
       [t('pd_matches'), playerStats.matchesPlayed], [t('pd_p1'), playerStats.p1Wins],
