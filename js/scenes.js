@@ -3,9 +3,10 @@ import {el,button,image,group} from './dom.js';
 import {renderSelection} from './selection.js';
 import {renderPanel} from './panels.js';
 import {menuDescription} from './menu-copy.js';
+import {renderRoom} from './room-flow.js';
 export class Scenes{
   constructor(app){this.app=app;this.host=document.getElementById('scene');this.dispose=null;}
-  show(name,options={}){const app=this.app,t=app.t,host=this.host;this.dispose?.();this.dispose=null;app.state=name;app.hud.hide();host.hidden=name==='battle';host.replaceChildren();host.className='screen';document.documentElement.lang=app.settings.lang;
+  show(name,options={}){const app=this.app,t=app.t,host=this.host;this.dispose?.();this.dispose=null;if(name==='menu'||name==='title'){app.onlineDispose?.();app.onlineDispose=null;app.net?.leaveRoom();if(app.mode==='ONLINE')app.mode='LOCAL';}app.state=name;app.hud.hide();host.hidden=name==='battle';host.replaceChildren();host.className='screen';document.documentElement.lang=app.settings.lang;
     const music=['select','vs'].includes(name)?'select':['battle','victory'].includes(name)?'battle':['intro','title'].includes(name)?'title':'menu';app.audio.play(music);
     document.getElementById('touch').hidden=name!=='battle'||!matchMedia('(pointer:coarse)').matches;
     if(name==='battle')return;
@@ -13,8 +14,9 @@ export class Scenes{
     else if(name==='title'){host.classList.add('title');host.append(image(app.assets.url('assets/ui/game-logo.png'),'Axie Smash'),button('PRESS START',()=>app.show('menu')));const handler=()=>app.show('menu');window.addEventListener('keydown',handler,{once:true});this.dispose=()=>window.removeEventListener('keydown',handler);}
     else if(name==='menu')this.menu(options.group||'root');
     else if(name==='select')this.dispose=renderSelection(host,app);
-    else if(name==='vs'){host.classList.add('vs');app.selected.forEach(key=>host.append(group('versus-art',image(app.assets.portrait(key),ROSTER[key].label),el('h1',ROSTER[key].label))));host.append(el('strong','VS',{className:'vs-mark'}));const timer=setTimeout(()=>app.startMatch(),1900);this.dispose=()=>clearTimeout(timer);}
-    else if(name==='victory'){host.append(group('panel',el('h1',t('victory')+' · '+ROSTER[app.selected[options.side]].label),group('actions',button(t('rematch'),()=>app.startMatch()),button(t('menu'),()=>app.show('menu')))));}
+    else if(name==='room')this.dispose=renderRoom(host,app);
+    else if(name==='vs'){host.classList.add('vs');app.selected.forEach(key=>host.append(group('versus-art',image(app.assets.portrait(key),ROSTER[key].label),el('h1',ROSTER[key].label))));host.append(el('strong','VS',{className:'vs-mark'}));const timer=app.mode==='ONLINE'?null:setTimeout(()=>app.startMatch(),1900);this.dispose=()=>clearTimeout(timer);}
+    else if(name==='victory'){host.append(group('panel',el('h1',t('victory')+' · '+ROSTER[app.selected[options.side]].label),group('actions',button(t('rematch'),()=>app.mode==='ONLINE'?app.show('room'):app.startMatch()),button(t('menu'),()=>app.show('menu')))));}
     else{this.dispose=renderPanel(host,app,name);host.append(button(t('back'),()=>app.show(options.returnTo||'menu',options.returnTo?{}:{group:['guide','controls','credits'].includes(name)?'help':'root'}),false));host.lastChild.className='back';}
   }
   menu(name){const app=this.app,t=app.t,host=this.host;host.classList.add('menu');host.append(el('h1',t(name==='root'?'menu':name)));const list=group('menu-list');
