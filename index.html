@@ -2,19 +2,24 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Axie Smash</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Axie Smash v0.21</title>
 <link rel="stylesheet" href="./src/styles/game.css">
 </head>
 <body>
 
 <div id="game-container">
 
+  <!-- ============ AVISO INICIAL ============ -->
+  <div id="screen-splash" class="screen">
+    <img id="prototype-disclaimer" src="./assets/ui/prototype-disclaimer.jpg" alt="Aviso: prototipo jugable, no representa el producto final. Pulsa cualquier botón para continuar.">
+  </div>
+
   <!-- ============ INTRO ============ -->
-  <div id="screen-intro" class="screen">
-    <video id="intro-video" preload="auto" playsinline>
+  <div id="screen-intro" class="screen hidden">
+    <video id="intro-video" preload="auto" autoplay muted playsinline>
       <source src="./assets/video/intro.mp4" type="video/mp4">
     </video>
-    <button id="intro-play-btn" class="intro-action hidden" type="button">▶ REPRODUCIR INTRO</button>
     <button id="intro-skip-btn" class="intro-skip" type="button">OMITIR ▶</button>
   </div>
 
@@ -25,6 +30,7 @@
 
   <!-- ============ MENÚ PRINCIPAL ============ -->
   <div id="screen-menu" class="screen hidden">
+    <img class="menu-key-art" src="./assets/sprites/olek/portrait.png" alt="Olek">
     <canvas id="menu-mascot-canvas" width="320" height="440" class="hidden"></canvas>
     <div class="menu-title-v2" id="menu-title-text">MENÚ PRINCIPAL</div>
     <div class="menu-list" id="menu-list"></div>
@@ -32,6 +38,15 @@
   </div>
 
   <!-- ============ OPCIONES ============ -->
+  <div id="screen-room" class="screen hidden">
+    <section class="room-panel">
+      <h1 id="room-title">SALA</h1><p id="room-description"></p>
+      <div class="room-actions"><button class="arcade-btn" id="room-create">CREAR</button><button class="arcade-btn secondary" id="room-join">UNIRSE</button></div>
+      <label for="room-server">SERVIDOR</label><input id="room-server" type="url" aria-label="Servidor de la sala" placeholder="http://localhost:8080" spellcheck="false">
+      <label id="room-code-label" for="room-code">CÓDIGO</label><input id="room-code" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC123">
+      <p id="room-status" role="status" aria-live="polite"></p><button class="arcade-btn secondary" id="room-leave">SALIR DE SALA</button>
+    </section>
+  </div>
   <div id="screen-options" class="screen bg-arcade hidden">
     <div class="options-title" id="options-title-text">OPCIONES</div>
     <div class="options-panel">
@@ -81,7 +96,7 @@
       <div class="portrait-col portrait-col-left">
         <div class="portrait-frame-lg"><img id="p1-portrait-img" class="portrait-img" alt="P1"></div>
         <img id="p1-preview-logo" class="preview-logo" alt="Logo P1">
-        <div class="portrait-name" id="p1-portrait-label">OLEG</div>
+        <div class="portrait-name" id="p1-portrait-label">OLEK</div>
         <div class="portrait-subtitle" id="p1-portrait-subtitle">GUARDIÁN VERDE · PLANTA</div>
         <div class="portrait-tag">1P</div>
         <div class="core-chips" id="p1-core-parts-select"></div>
@@ -126,7 +141,7 @@
     <div class="vs-side vs-side-left">
       <img id="vs-p1-art" class="vs-art" alt="P1">
       <img id="vs-p1-logo" class="vs-logo" alt="Logo P1">
-      <strong id="vs-p1-name">OLEG</strong>
+      <strong id="vs-p1-name">OLEK</strong>
     </div>
     <div class="vs-center"><span>VS</span><small>AXIE SMASH</small></div>
     <div class="vs-side vs-side-right">
@@ -149,23 +164,23 @@
   <div id="hud" class="hidden">
     <div class="character-logo-slot" id="p1-logo-slot"><img id="p1-hud-logo" alt="Logo P1"></div>
     <div class="hp-block" id="p1-hp-block">
-      <div class="hp-frame"><i class="frame-bolt left"></i><i class="frame-bolt right"></i><div class="hp-bar-outer"><div class="hp-bar-inner" id="p1-hp-bar" style="width:100%"></div></div></div>
+      <div class="hp-frame"><i class="frame-bolt left"></i><i class="frame-bolt right"></i><div class="hp-bar-outer"><div class="hp-damage-trail" id="p1-hp-trail" style="width:100%"></div><div class="hp-bar-inner" id="p1-hp-bar" style="width:100%"></div></div></div>
       <div class="hud-status-row"><div class="hp-label" id="p1-hp-label">JUGADOR 1</div><div class="class-status" id="p1-class-status">PLANT</div></div>
-      <div class="energy-frame"><span class="energy-label">AXP</span><div class="axp-bar-outer" id="p1-axp-outer"><div class="axp-bar-inner" id="p1-axp-bar" style="width:0%"></div></div></div>
+      <div class="energy-frame"><span class="energy-label">OVERDRIVE</span><div class="axp-bar-outer" id="p1-axp-outer"><div class="axp-bar-inner" id="p1-axp-bar" style="width:0%"></div></div></div>
       <div class="core-chips hud-chips" id="p1-core-parts-hud"></div>
       <div class="round-wins" id="p1-round-wins" role="img" aria-label="0 / 2"><i></i><i></i></div>
     </div>
     <div class="hud-center-slot" aria-hidden="true"></div>
     <div class="hp-block" id="p2-hp-block">
-      <div class="hp-frame"><i class="frame-bolt left"></i><i class="frame-bolt right"></i><div class="hp-bar-outer"><div class="hp-bar-inner" id="p2-hp-bar" style="width:100%"></div></div></div>
+      <div class="hp-frame"><i class="frame-bolt left"></i><i class="frame-bolt right"></i><div class="hp-bar-outer"><div class="hp-damage-trail" id="p2-hp-trail" style="width:100%"></div><div class="hp-bar-inner" id="p2-hp-bar" style="width:100%"></div></div></div>
       <div class="hud-status-row"><div class="hp-label" id="p2-hp-label">JUGADOR 2</div><div class="class-status" id="p2-class-status">BEAST</div></div>
-      <div class="energy-frame"><span class="energy-label">AXP</span><div class="axp-bar-outer" id="p2-axp-outer"><div class="axp-bar-inner" id="p2-axp-bar" style="width:0%"></div></div></div>
+      <div class="energy-frame"><span class="energy-label">OVERDRIVE</span><div class="axp-bar-outer" id="p2-axp-outer"><div class="axp-bar-inner" id="p2-axp-bar" style="width:0%"></div></div></div>
       <div class="core-chips hud-chips" id="p2-core-parts-hud"></div>
       <div class="round-wins" id="p2-round-wins" role="img" aria-label="0 / 2"><i></i><i></i></div>
     </div>
     <div class="character-logo-slot" id="p2-logo-slot"><img id="p2-hud-logo" alt="Logo P2"></div>
   </div>
-  <div id="timer" class="hidden"><div class="timer-core"><span id="timer-value">60</span></div></div>
+  <div id="timer" class="hidden"><div class="timer-core"><span id="timer-value">99</span></div></div>
   <div id="controls-hint" class="hidden"></div>
   <div id="round-callout" class="hidden" aria-live="polite"><span id="round-caption"></span><strong id="round-word"></strong></div>
 
@@ -182,6 +197,13 @@
     </div>
   </div>
 
+  <button id="pause-btn" class="hidden" aria-label="Pausar combate">Ⅱ PAUSA</button>
+  <div id="pause-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+    <div class="pause-card"><h2 id="pause-title">PAUSA</h2><p>El combate y el reloj están detenidos.</p>
+      <button class="arcade-btn" id="resume-btn">CONTINUAR</button>
+      <button class="arcade-btn secondary" id="pause-menu-btn">MENÚ PRINCIPAL</button>
+    </div>
+  </div>
   <canvas id="game-canvas" width="900" height="560"></canvas>
 
   <button id="global-back-btn" class="hidden">◀ REGRESAR</button>
@@ -191,3 +213,4 @@
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>
+
